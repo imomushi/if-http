@@ -19,26 +19,29 @@ foreach ($config['pipeline_definition'] as $k => $v)
 					$dependencies[] = $d['from'];
 				}
 			}
-			$routes[$segment['path']] = ['pipeline' => $k, 'direct' => ($dependencies === [$id])];
+            $method = (isset($segment['method'])) ? $segment['method'] : 'get';
+			$routes[$method.':'.$segment['path']] = ['pipeline' => $k, 'direct' => ($dependencies === [$id])];
 		}
 	}
 }
 
 $uri = explode('?', $_SERVER['REQUEST_URI']);
 $path = $uri[0];
+$method = strtolower($_SERVER["REQUEST_METHOD"]);
+$key = $method.':'.$path;
 
-if (array_key_exists($path, $routes))
+if (array_key_exists($key, $routes))
 {
 	$if2engine = new If2Engine();
-	$if2engine->sendRequestInput($routes[$path]['pipeline']);
-	if ($routes[$path]['direct'])
+	$if2engine->sendRequestInput($routes[$key]['pipeline']);
+	if ($routes[$key]['direct'])
 	{
 		echo "Success";
 	}
 	else
 	{
 		$result = $if2engine->receiveRequestOutput();
-		echo json_encode($result);
+        echo $result['output'];
 	}
 }
 else
