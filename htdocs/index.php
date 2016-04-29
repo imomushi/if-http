@@ -3,8 +3,6 @@
 require_once __DIR__."/../config/config.php";
 require_once __DIR__."/../src/If2Engine.php";
 
-const BASE_PATH = '/imomushi';
-
 // Routing Settings
 $routes = [];
 foreach ($config['pipeline_definition'] as $k => $v)
@@ -21,7 +19,7 @@ foreach ($config['pipeline_definition'] as $k => $v)
 					$dependencies[] = $d['from'];
 				}
 			}
-			$routes[BASE_PATH.$segment['path']] = ['pipeline' => $k, 'direct' => ($dependencies === [$id])];
+			$routes[$segment['path']] = ['pipeline' => $k, 'direct' => ($dependencies === [$id])];
 		}
 	}
 }

@@ -12,7 +12,7 @@ class If2Engine
 	
 	public function __construct()
 	{
-		$this->id = 1;
+		$this->id = rand();
 		$this->file_line_count[self::FILE_REQUEST_OUTPUT] = $this->countLine(self::FILE_REQUEST_OUTPUT);
 	}
 
@@ -64,6 +64,7 @@ class If2Engine
 			'cookies' => $_COOKIE,
 			'params'  => array_merge($_POST, $_GET),
 			'path'    => $_SERVER['REQUEST_URI'],
+			'body'    => file_get_contents('php://input'),
 		];
 		
 		$input = json_encode(['request_id' => $this->id, 'pipeline_id' => $pipeline_id, 'args' => $args]);
