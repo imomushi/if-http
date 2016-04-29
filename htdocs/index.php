@@ -5,14 +5,23 @@ require_once __DIR__."/../src/If2Engine.php";
 
 const BASE_PATH = '/imomushi';
 
+// Routing Settings
 $routes = [];
 foreach ($config['pipeline_definition'] as $k => $v)
 {
-	foreach ($v['segments'] as $segment)
+	foreach ($v['segments'] as $id => $segment)
 	{
 		if ($segment['type'] === 'input' && $segment['protocol'] === 'http')
 		{
-			$routes[BASE_PATH.$segment['path']] = $k;
+			$dependencies = [];
+			foreach ($v['dependencies'] as $d)
+			{
+				if ($v['segments'][$d['to']]['type'] === 'output' && $v['segments'][$d['to']]['protocol'] === 'http')
+				{
+					$dependencies[] = $d['from'];
+				}
+			}
+			$routes[BASE_PATH.$segment['path']] = ['pipeline' => $k, 'direct' => ($dependencies === [$id])];
 		}
 	}
 }
@@ -22,10 +31,17 @@ $path = $uri[0];
 
 if (array_key_exists($path, $routes))
 {
-	$if = new If2Engine();
-	$if->sendRequestInput($routes[$path]);
-	$result = $if->receiveRequestOutput();
-	echo json_encode($result);
+	$if2engine = new If2Engine();
+	$if2engine->sendRequestInput($routes[$path]['pipeline']);
+	if ($routes[$path]['direct'])
+	{
+		echo "Success";
+	}
+	else
+	{
+		$result = $if2engine->receiveRequestOutput();
+		echo json_encode($result);
+	}
 }
 else
 {
