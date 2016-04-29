@@ -3,28 +3,66 @@
 $config = [];
 
 $config['pipeline_definition'] = [
-	'pipeline1' => [
+	'repeat' => [
 		'segments' => [
 			1 => [
 				'type' => 'input',
-				'path' => '/bot',
+				'path' => '/imomushi/repeat',
 				'protocol' => 'http',
 			],
 			2 => [
 				'type' => 'function',
-				'function' => 'func1',
+				'function' => 'ParseLineInput',
 			],
 			3 => [
 				'type' => 'function',
-				'function' => 'func2',
+				'function' => 'CallLineBotApi',
+				'config' => [
+					 'line_channel_id'     => getenv('LINE_CHANNEL_ID'),
+					 'line_channel_secret' => getenv('LINE_CHANNEL_SECRET'),
+					 'line_channel_mid'    => getenv('LINE_CHANNEL_MID'),
+				]
+			],
+			4 => [
+				'type' => 'output',
+				'protocol' => 'http',
+			]
+		],
+		'dependencies' => [
+			[
+				'from' => 1,
+				'to' => 2,
+			],[
+				'from' => 2,
+				'to' => 3,
+			],[
+				'from' => 1,
+				'to' => 4,
+			]
+		]
+	],
+	'pipeline1' => [
+		'segments' => [
+			1 => [
+				'type' => 'input',
+				'path' => '/imomushi/bot',
+				'protocol' => 'http',
+			],
+			2 => [
+				'type' => 'function',
+				'function' => 'EchoStdout',
+			],
+			3 => [
+				'type' => 'function',
+				'function' => 'EchoStdout',
 			],
 			4 => [
 				'type' => 'function',
-				'function' => 'func2',
+				'function' => 'EchoStdout',
 			],
 			5 => [
 				'type' => 'function',
-				'function' => 'func3',
+				'function' => 'EchoStdout',
 			],
 			6 => [
 				'type' => 'output',
@@ -48,7 +86,7 @@ $config['pipeline_definition'] = [
 				'from' => 4,
 				'to' => 5,
 			],[
-				'from' => 1,
+				'from' => 5,
 				'to' => 6,
 			]
 		]
@@ -57,7 +95,7 @@ $config['pipeline_definition'] = [
 		'segments' => [
 			1 => [
 				'type' => 'input',
-				'path' => '/hoge',
+				'path' => '/imomushi/hoge',
 				'protocol' => 'http',
 			],
 			2 => [
